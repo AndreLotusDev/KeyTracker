@@ -4,10 +4,10 @@ Core of the app: keyboard layout model + key capture via a Windows hook.
 
 ## Scope
 
-- `KeyTracker.Core/Models`: `Key` (ScanCode, VirtualKey, Label, X, Y, Width, Height)
-- `KeyTracker.Core/Keyboards`: abstract `KeyboardLayout` + `ABNT2` implementation (only this one for now, ANSI/ISO/Custom stay pluggable but not implemented yet)
-- `KeyTracker.Infrastructure/Windows`: low-level keyboard hook (`WH_KEYBOARD_LL`) capturing keys globally
-- `KeyTracker.Core/Tracking`: service that receives hook events and accumulates counts in memory (by ScanCode)
+- [x] `KeyTracker.Core/Models`: `Key` (ScanCode, VirtualKey, Label, X, Y, Width, Height)
+- [x] `KeyTracker.Core/Keyboards`: abstract `KeyboardLayout` + `ABNT2` implementation (only this one for now, ANSI/ISO/Custom stay pluggable but not implemented yet)
+- [x] `KeyTracker.Infrastructure/Windows`: low-level keyboard hook (`WH_KEYBOARD_LL`) capturing keys globally
+- [x] `KeyTracker.Core/Tracking`: service that receives hook events and accumulates counts in memory (by ScanCode)
 
 ## Performance (critical)
 
@@ -16,6 +16,6 @@ Core of the app: keyboard layout model + key capture via a Windows hook.
 
 ## Acceptance criteria
 
-- Running the app and typing, the in-memory counter reflects the correct keys (verify via test or temporary log)
-- Hook doesn't freeze or noticeably delay typing
-- Logs `KeyboardHookRegistered` / `KeyboardHookFailed` as appropriate
+- [x] Running the app and typing, the in-memory counter reflects the correct keys (verify via test or temporary log)
+- [x] Hook doesn't freeze or noticeably delay typing
+- [x] Logs `KeyboardHookRegistered` / `KeyboardHookFailed` as appropriate

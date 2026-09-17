@@ -10,6 +10,7 @@
 - All new code needs tests with coverage (see task 07).
 - This document is living: update it as the project evolves, but keep it minimal.
 - **Docs in `/docs` are living too.** Whenever a change touches frontend code, backend code, or a feature's behavior, update the matching doc in the same change — [docs/frontend.md](docs/frontend.md), [docs/backend.md](docs/backend.md), or the relevant page under [docs/business/](docs/business/). Stale docs are treated as a bug, since e2e tests are written from them.
+- **New tasks follow this format:** a `## Scope` list and an `## Acceptance criteria` list, both as `- [ ]` checkboxes. Check a box (`- [x]`) only when that item is actually done in the code, not when it's planned. Update the [Task status](#task-status) table in the same change.
 
 ## Overview
 
@@ -201,4 +202,17 @@ The same statistics render on any layout without rewriting the tracker.
 
 ## Tasks
 
-See [`/tasks`](tasks/). Execute in order (01 → 07).
+See [`/tasks`](tasks/). Execute in order (01 → 08).
+
+### Task status
+
+| # | Task | Status |
+|---|------|--------|
+| 01 | [project-setup](tasks/01-project-setup.md) | Done |
+| 02 | [keyboard-tracking](tasks/02-keyboard-tracking.md) | Done |
+| 03 | [storage-and-migrations](tasks/03-storage-and-migrations.md) | Done |
+| 04 | [statistics-and-export](tasks/04-statistics-and-export.md) | Done |
+| 05 | [dashboard-ui](tasks/05-dashboard-ui.md) | Done |
+| 06 | [installer-and-release](tasks/06-installer-and-release.md) | Done |
+| 07 | [tests-and-coverage](tasks/07-tests-and-coverage.md) | Done |
+| 08 | [e2e-tests](tasks/08-e2e-tests.md) | Not started |
