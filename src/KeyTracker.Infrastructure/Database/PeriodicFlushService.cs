@@ -8,7 +8,7 @@ public sealed class PeriodicFlushService : IDisposable
     private readonly KeyPressTracker _tracker;
     private readonly DailyKeyRecordRepository _repository;
     private readonly KeyboardLayout _layout;
-    private readonly Timer _timer;
+    private readonly System.Threading.Timer _timer;
     private readonly object _flushLock = new();
 
     public PeriodicFlushService(KeyPressTracker tracker, DailyKeyRecordRepository repository, KeyboardLayout layout, TimeSpan interval)
@@ -16,7 +16,7 @@ public sealed class PeriodicFlushService : IDisposable
         _tracker = tracker;
         _repository = repository;
         _layout = layout;
-        _timer = new Timer(_ => Flush(), null, interval, interval);
+        _timer = new System.Threading.Timer(_ => Flush(), null, interval, interval);
     }
 
     public void Flush()

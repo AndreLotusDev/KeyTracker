@@ -1,12 +1,114 @@
-﻿<Window x:Class="KeyTracker.App.Views.MainWindow"
+<Window x:Class="KeyTracker.App.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KeyTracker.App.Views"
         mc:Ignorable="d"
-        Title="KeyTracker" Height="450" Width="800">
-    <Grid>
+        Title="KeyTracker" Height="650" Width="900"
+        Background="#1B1D22">
+    <Window.Resources>
+        <local:IntensityToBrushConverter x:Key="IntensityToBrushConverter" />
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="KeyTracker" FontSize="24" FontWeight="Bold" Foreground="White" DockPanel.Dock="Left" VerticalAlignment="Center" />
+            <ComboBox DockPanel.Dock="Right" Width="140" HorizontalAlignment="Right"
+                      ItemsSource="{Binding Periods}" SelectedItem="{Binding SelectedPeriod}" />
+        </DockPanel>
+
+        <!-- Cards -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="#24272E" CornerRadius="6" Margin="0,0,10,0" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="{Binding PeriodTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="{Binding PeriodTotalLabel}" Foreground="#9AA0AC" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#24272E" CornerRadius="6" Margin="5,0,5,0" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="{Binding DailyAverage, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Daily average" Foreground="#9AA0AC" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Background="#24272E" CornerRadius="6" Margin="10,0,0,0" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="{Binding ThisMonthTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="This month" Foreground="#9AA0AC" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Heatmap -->
+        <Border Grid.Row="2" Background="#24272E" CornerRadius="6" Padding="16" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Keyboard Heatmap" Foreground="#9AA0AC" Margin="0,0,0,12" />
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding HeatmapKeys}"
+                                  Width="{Binding HeatmapWidth}" Height="{Binding HeatmapHeight}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="{Binding RenderWidth}" Height="{Binding RenderHeight}"
+                                        CornerRadius="4"
+                                        Background="{Binding Intensity, Converter={StaticResource IntensityToBrushConverter}}"
+                                        ToolTip="{Binding Count}">
+                                    <TextBlock Text="{Binding Label}" Foreground="White" FontSize="11"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <!-- Activity chart -->
+        <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Activity" Foreground="#9AA0AC" Margin="0,0,0,12" />
+
+                <Viewbox Grid.Row="1" Stretch="Fill">
+                    <Canvas Width="600" Height="140">
+                        <Polyline Points="{Binding ChartPoints}" Stroke="#4FA0E0" StrokeThickness="2" />
+                    </Canvas>
+                </Viewbox>
+
+                <Button Grid.Row="2" Content="Export XLSX" Command="{Binding ExportCommand}"
+                        HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>
