@@ -1,0 +1,12 @@
+11:41:20.802 launching
+11:41:23.206 launched
+11:41:23.219 trayWnd: True
+11:41:23.295 icon directly on bar: True
+11:41:23.366 chevron: True
+11:41:24.727 overflow: True
+11:41:24.755 icon in overflow: True
+11:41:24.765 icon rect: X=3013 Y=1095 W=40 H=40
+11:41:25.281 right-clicked
+11:41:26.577 menu: True
+11:41:26.578 menu rect: X=2869 Y=1067 W=164 H=48
+11:41:28.596 HasExited: True

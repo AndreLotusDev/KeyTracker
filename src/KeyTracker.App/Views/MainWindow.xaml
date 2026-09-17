@@ -22,6 +22,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="KeyTracker" FontSize="24" FontWeight="Bold" Foreground="White" DockPanel.Dock="Left" VerticalAlignment="Center" />
             <ComboBox DockPanel.Dock="Right" Width="140" HorizontalAlignment="Right"
+                      AutomationProperties.AutomationId="PeriodComboBox"
                       ItemsSource="{Binding Periods}" SelectedItem="{Binding SelectedPeriod}" />
         </DockPanel>
 
@@ -35,21 +36,25 @@
 
             <Border Grid.Column="0" Background="#24272E" CornerRadius="6" Margin="0,0,10,0" Padding="16">
                 <StackPanel>
-                    <TextBlock Text="{Binding PeriodTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
-                    <TextBlock Text="{Binding PeriodTotalLabel}" Foreground="#9AA0AC" Margin="0,4,0,0" />
+                    <TextBlock AutomationProperties.AutomationId="PeriodTotalText"
+                               Text="{Binding PeriodTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock AutomationProperties.AutomationId="PeriodTotalLabelText"
+                               Text="{Binding PeriodTotalLabel}" Foreground="#9AA0AC" Margin="0,4,0,0" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="1" Background="#24272E" CornerRadius="6" Margin="5,0,5,0" Padding="16">
                 <StackPanel>
-                    <TextBlock Text="{Binding DailyAverage, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock AutomationProperties.AutomationId="DailyAverageText"
+                               Text="{Binding DailyAverage, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
                     <TextBlock Text="Daily average" Foreground="#9AA0AC" Margin="0,4,0,0" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="2" Background="#24272E" CornerRadius="6" Margin="10,0,0,0" Padding="16">
                 <StackPanel>
-                    <TextBlock Text="{Binding ThisMonthTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
+                    <TextBlock AutomationProperties.AutomationId="ThisMonthTotalText"
+                               Text="{Binding ThisMonthTotal, StringFormat=N0}" FontSize="28" FontWeight="Bold" Foreground="White" />
                     <TextBlock Text="This month" Foreground="#9AA0AC" Margin="0,4,0,0" />
                 </StackPanel>
             </Border>
@@ -60,7 +65,8 @@
             <StackPanel>
                 <TextBlock Text="Keyboard Heatmap" Foreground="#9AA0AC" Margin="0,0,0,12" />
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding HeatmapKeys}"
+                    <ItemsControl AutomationProperties.AutomationId="HeatmapItemsControl"
+                                  ItemsSource="{Binding HeatmapKeys}"
                                   Width="{Binding HeatmapWidth}" Height="{Binding HeatmapHeight}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -95,10 +101,12 @@
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                     <TextBlock Text="Activity" Foreground="#9AA0AC" DockPanel.Dock="Left" VerticalAlignment="Center" />
                     <ComboBox DockPanel.Dock="Right" Width="100" HorizontalAlignment="Right"
+                              AutomationProperties.AutomationId="ChartGranularityComboBox"
                               ItemsSource="{Binding ChartGranularities}" SelectedItem="{Binding SelectedChartGranularity}" />
                 </DockPanel>
 
                 <Button DockPanel.Dock="Bottom" Content="Export XLSX" Command="{Binding ExportCommand}"
+                        AutomationProperties.AutomationId="ExportButton"
                         HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
 
                 <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding ChartLabels}" Margin="0,4,0,0">

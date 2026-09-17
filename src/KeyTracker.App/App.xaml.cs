@@ -73,7 +73,9 @@ public partial class App : Application
         };
         _trayIcon.ExitRequested += Shutdown;
 
-        if (Environment.ProcessPath is { } exePath)
+        // Skip touching the real Windows startup registration when running under e2e tests
+        // (signaled by KEYTRACKER_DATA_DIR pointing at an isolated, disposable data directory).
+        if (Environment.GetEnvironmentVariable("KEYTRACKER_DATA_DIR") is null && Environment.ProcessPath is { } exePath)
             StartupRegistration.Enable(exePath);
 
         base.OnStartup(e);

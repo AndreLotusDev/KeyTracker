@@ -6,7 +6,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
-$solution = Join-Path $root "KeyTracker.sln"
+$unitTestProject = Join-Path $root "tests\KeyTracker.Tests\KeyTracker.Tests.csproj"
+$e2eTestProject = Join-Path $root "tests\KeyTracker.E2E\KeyTracker.E2E.csproj"
 $appProject = Join-Path $root "src\KeyTracker.App\KeyTracker.App.csproj"
 $installerScript = Join-Path $root "installer\setup.iss"
 $distDir = Join-Path $root "dist\$Version"
@@ -26,10 +27,16 @@ function Find-InnoSetupCompiler {
     throw "Inno Setup compiler (ISCC.exe) not found. Install Inno Setup 6: https://jrsoftware.org/isdl.php"
 }
 
-Write-Host "==> Running tests with coverage"
-dotnet test $solution --collect:"XPlat Code Coverage"
+Write-Host "==> Running unit tests with coverage"
+dotnet test $unitTestProject --collect:"XPlat Code Coverage"
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet test failed with exit code $LASTEXITCODE"
+}
+
+Write-Host "==> Running e2e tests"
+dotnet test $e2eTestProject
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet test (e2e) failed with exit code $LASTEXITCODE"
 }
 
 Write-Host "==> Publishing $Version"
