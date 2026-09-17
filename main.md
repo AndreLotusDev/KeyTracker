@@ -2,13 +2,14 @@
 
 ## Rules for the agent
 
-- Always keep this file and everything in `/tasks` written in English.
+- Always keep this file, everything in `/tasks`, and everything in `/docs` written in English.
 - Minimalist always. No overengineering, no speculative abstraction, no unrequested feature.
 - Straight to the point. No flowery text, no redundant summaries, no "ai slop".
 - Tasks live in `/tasks`, one per file, numbered in execution order.
 - When a task's acceptance criteria are met, **stop and check with the user** before moving to the next one.
 - All new code needs tests with coverage (see task 07).
 - This document is living: update it as the project evolves, but keep it minimal.
+- **Docs in `/docs` are living too.** Whenever a change touches frontend code, backend code, or a feature's behavior, update the matching doc in the same change — [docs/frontend.md](docs/frontend.md), [docs/backend.md](docs/backend.md), or the relevant page under [docs/business/](docs/business/). Stale docs are treated as a bug, since e2e tests are written from them.
 
 ## Overview
 
@@ -31,6 +32,51 @@ Windows app that tracks typed keys, shows a heatmap and a usage dashboard.
 - Support for multiple keyboard layouts
 - Dashboard: totals for day, week, month, year + daily average
 - Export dashboard as XLSX
+
+## Documentation
+
+Detailed, living docs live in `/docs`, split by layer:
+
+- [docs/frontend.md](docs/frontend.md) — WPF views, view models, bindings, window lifecycle.
+- [docs/backend.md](docs/backend.md) — tracking, storage, migrations, statistics, export, Windows integration, logging.
+- [docs/business/](docs/business/) — one file per feature/screen ("page"), describing how it behaves for a user. Current pages: [dashboard.md](docs/business/dashboard.md), [tray-icon.md](docs/business/tray-icon.md), [export-xlsx.md](docs/business/export-xlsx.md).
+
+Keep them updated whenever the corresponding code changes (see rules above). These docs are the source of truth used to write e2e tests — if a doc doesn't match behavior, fix the doc or the code, don't leave the mismatch.
+
+### Template for a business doc page
+
+Every file under `docs/business/` follows this structure:
+
+```markdown
+# Page: <Name>
+
+## Purpose
+One or two sentences: what this page/feature is for.
+
+## How it works
+Short description of the mechanism: what triggers it, what data it reads/writes, what it renders.
+
+## Expected flows
+### Flow: <name>
+1. Step
+2. Step
+3. Step
+
+(one subsection per distinct user flow, including edge/cancel paths)
+
+## Expected results
+Concrete, checkable outcomes for each flow (what should be true after it runs, including edge cases like empty data).
+
+## Functional requirements
+- FR1: ...
+- FR2: ...
+
+## Non-functional requirements
+- NFR1: ...
+
+## Out of scope / known limits
+What this page intentionally does not do.
+```
 
 ## Project structure
 
@@ -90,36 +136,7 @@ KeyTracker/
 }
 ```
 
-## Dashboard V1
-
-```
-┌─────────────────────────────────────────────┐
-│ KeyTracker                         Today ▼  │
-├─────────────────────────────────────────────┤
-│                                             │
-│  58.392          51.203          1.24 M     │
-│  Today           Daily average   This month │
-│                                             │
-├─────────────────────────────────────────────┤
-│                                             │
-│             Keyboard Heatmap                │
-│                                             │
-│      [Q][W][E][R][T][Y][U][I][O][P]         │
-│       [A][S][D][F][G][H][J][K][L]           │
-│        [Z][X][C][V][B][N][M]                │
-│                                             │
-├─────────────────────────────────────────────┤
-│ Activity                                    │
-│                                             │
-│  60k ┤       ╭─╮                            │
-│  40k ┤ ╭─╮ ╭─╯ ╰─╮                          │
-│  20k ┤─╯ ╰─╯     ╰──                        │
-│      └────────────────────────────           │
-│        M  T  W  T  F  S  S                  │
-│                                             │
-│                                [Export XLSX]│
-└─────────────────────────────────────────────┘
-```
+Storage/migration details: [docs/backend.md](docs/backend.md).
 
 ## Logs
 
@@ -135,19 +152,7 @@ KeyTracker/
         └── log-20260917.txt
 ```
 
-Event types:
-
-```
-ApplicationStarted
-DatabaseOpened
-MigrationStarted
-MigrationCompleted
-KeyboardHookRegistered
-KeyboardHookFailed
-ExportStarted
-ExportCompleted
-UnhandledException
-```
+Event types are listed in [docs/backend.md](docs/backend.md#logging-infrastructureloggingloggersetupcs).
 
 ## Release
 
