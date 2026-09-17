@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KeyTracker.App.Views"
         mc:Ignorable="d"
-        Title="KeyTracker" Height="650" Width="900"
+        Title="KeyTracker" Height="720" Width="900" MinHeight="600" MinWidth="800"
         Background="#1B1D22">
     <Window.Resources>
         <local:IntensityToBrushConverter x:Key="IntensityToBrushConverter" />
@@ -90,25 +90,19 @@
         </Border>
 
         <!-- Activity chart -->
-        <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16" MinHeight="180">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Activity" Foreground="#9AA0AC" Margin="0,0,0,12" />
 
-                <TextBlock Grid.Row="0" Text="Activity" Foreground="#9AA0AC" Margin="0,0,0,12" />
+                <Button DockPanel.Dock="Bottom" Content="Export XLSX" Command="{Binding ExportCommand}"
+                        HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
 
-                <Viewbox Grid.Row="1" Stretch="Fill">
+                <Viewbox Stretch="Fill">
                     <Canvas Width="600" Height="140">
                         <Polyline Points="{Binding ChartPoints}" Stroke="#4FA0E0" StrokeThickness="2" />
                     </Canvas>
                 </Viewbox>
-
-                <Button Grid.Row="2" Content="Export XLSX" Command="{Binding ExportCommand}"
-                        HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
-            </Grid>
+            </DockPanel>
         </Border>
     </Grid>
 </Window>
