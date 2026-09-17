@@ -13,6 +13,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <AssemblyName>KeyTracker</AssemblyName>
   </PropertyGroup>
 
 </Project>
