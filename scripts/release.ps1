@@ -26,8 +26,8 @@ function Find-InnoSetupCompiler {
     throw "Inno Setup compiler (ISCC.exe) not found. Install Inno Setup 6: https://jrsoftware.org/isdl.php"
 }
 
-Write-Host "==> Running tests"
-dotnet test $solution
+Write-Host "==> Running tests with coverage"
+dotnet test $solution --collect:"XPlat Code Coverage"
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet test failed with exit code $LASTEXITCODE"
 }
