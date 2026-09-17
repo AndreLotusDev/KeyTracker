@@ -92,10 +92,28 @@
         <!-- Activity chart -->
         <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16" MinHeight="180">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Activity" Foreground="#9AA0AC" Margin="0,0,0,12" />
+                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <TextBlock Text="Activity" Foreground="#9AA0AC" DockPanel.Dock="Left" VerticalAlignment="Center" />
+                    <ComboBox DockPanel.Dock="Right" Width="100" HorizontalAlignment="Right"
+                              ItemsSource="{Binding ChartGranularities}" SelectedItem="{Binding SelectedChartGranularity}" />
+                </DockPanel>
 
                 <Button DockPanel.Dock="Bottom" Content="Export XLSX" Command="{Binding ExportCommand}"
                         HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
+
+                <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding ChartLabels}" Margin="0,4,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="#9AA0AC" FontSize="10"
+                                       HorizontalAlignment="Center" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Viewbox Stretch="Fill">
                     <Canvas Width="600" Height="140">

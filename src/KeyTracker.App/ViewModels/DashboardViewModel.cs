@@ -23,10 +23,12 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     private readonly KeyboardLayout _layout;
 
     private Period _selectedPeriod = Period.Today;
+    private ChartGranularity _selectedChartGranularity = ChartGranularity.Day;
     private long _periodTotal;
     private double _dailyAverage;
     private long _thisMonthTotal;
     private PointCollection _chartPoints = new();
+    private IReadOnlyList<string> _chartLabels = Array.Empty<string>();
 
     public DashboardViewModel(
         StatisticsCalculator statisticsCalculator,
@@ -58,6 +60,22 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
             _selectedPeriod = value;
             OnPropertyChanged();
             Refresh();
+        }
+    }
+
+    public IReadOnlyList<ChartGranularity> ChartGranularities { get; } = Enum.GetValues<ChartGranularity>();
+
+    public ChartGranularity SelectedChartGranularity
+    {
+        get => _selectedChartGranularity;
+        set
+        {
+            if (_selectedChartGranularity == value)
+                return;
+
+            _selectedChartGranularity = value;
+            OnPropertyChanged();
+            RefreshChart();
         }
     }
 
@@ -94,6 +112,12 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         private set { _chartPoints = value; OnPropertyChanged(); }
     }
 
+    public IReadOnlyList<string> ChartLabels
+    {
+        get => _chartLabels;
+        private set { _chartLabels = value; OnPropertyChanged(); }
+    }
+
     public ObservableCollection<HeatmapKeyViewModel> HeatmapKeys { get; } = new();
 
     public double HeatmapWidth { get; private set; }
@@ -120,8 +144,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
 
         var (from, to) = PeriodRange.For(SelectedPeriod, today);
 
-        var dailyTotals = _dailyTotalsSource.GetTotals(from, to);
-        ChartPoints = BuildChartPoints(dailyTotals);
+        RefreshChart();
 
         var keyTotals = _keyTotalsSource.GetKeyTotals(from, to, _layout.Name);
         var maxCount = keyTotals.Count == 0 ? 0 : keyTotals.Values.Max();
@@ -140,19 +163,41 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(HeatmapHeight));
     }
 
-    private static PointCollection BuildChartPoints(IReadOnlyList<DailyTotal> dailyTotals)
+    private void RefreshChart()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var (from, to) = ActivityChartBuilder.RangeFor(SelectedChartGranularity, today);
+
+        var dailyTotals = _dailyTotalsSource.GetTotals(from, to);
+        var buckets = ActivityChartBuilder.Build(dailyTotals, SelectedChartGranularity);
+
+        ChartPoints = BuildChartPoints(buckets);
+        ChartLabels = BuildChartLabels(buckets);
+    }
+
+    private static IReadOnlyList<string> BuildChartLabels(IReadOnlyList<ChartBucket> buckets)
+    {
+        const int maxLabels = 10;
+        var step = buckets.Count <= maxLabels ? 1 : (int)Math.Ceiling(buckets.Count / (double)maxLabels);
+
+        return buckets
+            .Select((bucket, index) => index % step == 0 ? bucket.Label : "")
+            .ToList();
+    }
+
+    private static PointCollection BuildChartPoints(IReadOnlyList<ChartBucket> buckets)
     {
         var points = new PointCollection();
-        if (dailyTotals.Count == 0)
+        if (buckets.Count == 0)
             return points;
 
-        var max = dailyTotals.Max(total => total.Total);
-        var count = dailyTotals.Count;
+        var max = buckets.Max(bucket => bucket.Total);
+        var count = buckets.Count;
 
         for (var i = 0; i < count; i++)
         {
             var x = count == 1 ? 0 : ChartWidth * i / (count - 1);
-            var y = max == 0 ? ChartHeight : ChartHeight - ChartHeight * dailyTotals[i].Total / max;
+            var y = max == 0 ? ChartHeight : ChartHeight - ChartHeight * buckets[i].Total / max;
             points.Add(new Point(x, y));
         }
 
