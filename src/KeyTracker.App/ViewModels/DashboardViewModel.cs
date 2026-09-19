@@ -168,11 +168,21 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         var today = DateOnly.FromDateTime(DateTime.Now);
         var (from, to) = ActivityChartBuilder.RangeFor(SelectedChartGranularity, today);
 
-        var dailyTotals = _dailyTotalsSource.GetTotals(from, to);
+        var dailyTotals = FillMissingDays(_dailyTotalsSource.GetTotals(from, to), from, to);
         var buckets = ActivityChartBuilder.Build(dailyTotals, SelectedChartGranularity);
 
         ChartPoints = BuildChartPoints(buckets);
         ChartBars = BuildChartBars(buckets);
+    }
+
+    // Storage only holds days with typing; without zero days, month/year buckets are missing or misaligned.
+    private static IReadOnlyList<DailyTotal> FillMissingDays(IReadOnlyList<DailyTotal> totals, DateOnly from, DateOnly to)
+    {
+        var byDate = totals.ToDictionary(total => total.Date, total => total.Total);
+        var days = new List<DailyTotal>();
+        for (var day = from; day <= to; day = day.AddDays(1))
+            days.Add(new DailyTotal(day, byDate.GetValueOrDefault(day)));
+        return days;
     }
 
     private static IReadOnlyList<ChartBarViewModel> BuildChartBars(IReadOnlyList<ChartBucket> buckets)
