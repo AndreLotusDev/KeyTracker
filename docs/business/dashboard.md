@@ -44,7 +44,15 @@ On open, the window loads the current `SelectedPeriod` (default: Today) and rend
 
 Changing the period dropdown re-queries totals and the heatmap for that period. Changing the chart granularity dropdown re-queries and rebuilds only the chart (heatmap and cards are unaffected).
 
-Data source: LiteDB via `IDailyTotalsSource` / `IKeyTotalsSource` (see [docs/backend.md](../backend.md)). No caching — every dropdown change re-reads the database.
+The chart draws one point marker per bucket (for Day granularity: one per day that has recorded keys). Hovering a marker's column shows a tooltip `"<label>: <total>"` (e.g. `09/19: 1,234`) for that single bucket. The x-axis shows at most ~10 labels (every Nth bucket when there are more); the tooltip always carries the full label.
+
+The window content scrolls vertically when the window is too small to show everything (heatmap, chart, and Export button stay reachable). On tall windows the chart grows to fill the free space.
+
+The dashboard reloads (pending key presses are flushed to the database first, then cards, heatmap, and chart are re-read):
+- whenever the window is activated (gains focus, including when re-opened from the tray)
+- every 10 seconds while the window is visible and not minimized
+
+Data source: LiteDB via `IDailyTotalsSource` / `IKeyTotalsSource` (see [docs/backend.md](../backend.md)). No caching — every reload re-reads the database.
 
 ## Expected flows
 
@@ -61,7 +69,19 @@ Data source: LiteDB via `IDailyTotalsSource` / `IKeyTotalsSource` (see [docs/bac
 
 ### Flow: Change chart granularity (Day / Week / Month)
 1. User selects a new value in the chart's `ComboBox`.
-2. Only `ChartPoints` and `ChartLabels` update; cards and heatmap are untouched.
+2. Only `ChartPoints` and `ChartBars` update; cards and heatmap are untouched.
+
+### Flow: Inspect a single chart point
+1. User hovers a point on the chart line.
+2. A tooltip shows that bucket's label and total (`"<label>: <total>"`).
+
+### Flow: Refresh on focus / periodically
+1. User returns to the window (focus, or "Open Dashboard" from the tray), or 10 seconds pass while it is visible.
+2. Pending keys are flushed and the dashboard re-reads all data; cards, heatmap, and chart show the latest totals for the currently selected period and granularity.
+
+### Flow: Small window
+1. User resizes the window smaller than the content.
+2. A vertical scrollbar appears; the chart and Export button are reachable by scrolling.
 
 ### Flow: Close window
 1. User clicks the window's close button.
@@ -88,5 +108,5 @@ Data source: LiteDB via `IDailyTotalsSource` / `IKeyTotalsSource` (see [docs/bac
 
 ## Out of scope / known limits
 
-- No manual refresh button — data is only re-read on period/granularity change or app restart.
+- No manual refresh button — data is re-read on period/granularity change, window activation, and the 10 s timer.
 - No date range picker beyond the four fixed periods.

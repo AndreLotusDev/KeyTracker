@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 using KeyTracker.App.ViewModels;
 using KeyTracker.App.Views;
 using KeyTracker.Core.Keyboards;
@@ -21,6 +22,9 @@ public partial class App : Application
 {
     private static readonly TimeSpan FlushInterval = TimeSpan.FromSeconds(30);
 
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(10);
+
+    private DispatcherTimer? _refreshTimer;
     private KeyboardHook? _keyboardHook;
     private KeyPressTracker? _keyTracker;
     private KeyTrackerDatabase? _database;
@@ -61,6 +65,22 @@ public partial class App : Application
         };
         _mainWindow.Show();
 
+        // Flush pending key presses first so the dashboard shows up-to-date numbers.
+        void Reload()
+        {
+            _flushService.Flush();
+            viewModel.Refresh();
+        }
+
+        _mainWindow.Activated += (_, _) => Reload();
+        _refreshTimer = new DispatcherTimer { Interval = RefreshInterval };
+        _refreshTimer.Tick += (_, _) =>
+        {
+            if (_mainWindow.IsVisible && _mainWindow.WindowState != WindowState.Minimized)
+                Reload();
+        };
+        _refreshTimer.Start();
+
         var icon = Environment.ProcessPath is { } processPath
             ? System.Drawing.Icon.ExtractAssociatedIcon(processPath)
             : null;
@@ -83,6 +103,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _refreshTimer?.Stop();
         _flushService?.Flush();
         _flushService?.Dispose();
         _keyboardHook?.Dispose();

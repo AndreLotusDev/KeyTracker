@@ -28,7 +28,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     private double _dailyAverage;
     private long _thisMonthTotal;
     private PointCollection _chartPoints = new();
-    private IReadOnlyList<string> _chartLabels = Array.Empty<string>();
+    private IReadOnlyList<ChartBarViewModel> _chartBars = Array.Empty<ChartBarViewModel>();
 
     public DashboardViewModel(
         StatisticsCalculator statisticsCalculator,
@@ -112,10 +112,10 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         private set { _chartPoints = value; OnPropertyChanged(); }
     }
 
-    public IReadOnlyList<string> ChartLabels
+    public IReadOnlyList<ChartBarViewModel> ChartBars
     {
-        get => _chartLabels;
-        private set { _chartLabels = value; OnPropertyChanged(); }
+        get => _chartBars;
+        private set { _chartBars = value; OnPropertyChanged(); }
     }
 
     public ObservableCollection<HeatmapKeyViewModel> HeatmapKeys { get; } = new();
@@ -125,7 +125,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
 
     public ICommand ExportCommand { get; }
 
-    private void Refresh()
+    public void Refresh()
     {
         var today = DateOnly.FromDateTime(DateTime.Now);
         var summary = _statisticsCalculator.Summarize(today);
@@ -172,16 +172,21 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         var buckets = ActivityChartBuilder.Build(dailyTotals, SelectedChartGranularity);
 
         ChartPoints = BuildChartPoints(buckets);
-        ChartLabels = BuildChartLabels(buckets);
+        ChartBars = BuildChartBars(buckets);
     }
 
-    private static IReadOnlyList<string> BuildChartLabels(IReadOnlyList<ChartBucket> buckets)
+    private static IReadOnlyList<ChartBarViewModel> BuildChartBars(IReadOnlyList<ChartBucket> buckets)
     {
         const int maxLabels = 10;
         var step = buckets.Count <= maxLabels ? 1 : (int)Math.Ceiling(buckets.Count / (double)maxLabels);
+        var max = buckets.Count == 0 ? 0 : buckets.Max(bucket => bucket.Total);
 
         return buckets
-            .Select((bucket, index) => index % step == 0 ? bucket.Label : "")
+            .Select((bucket, index) => new ChartBarViewModel(
+                bucket.Label,
+                bucket.Total,
+                max == 0 ? 0 : (double)bucket.Total / max,
+                index % step == 0))
             .ToList();
     }
 
@@ -196,7 +201,8 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
 
         for (var i = 0; i < count; i++)
         {
-            var x = count == 1 ? 0 : ChartWidth * i / (count - 1);
+            // Center of each bar column, so points line up with the hover markers and labels.
+            var x = ChartWidth * (i + 0.5) / count;
             var y = max == 0 ? ChartHeight : ChartHeight - ChartHeight * buckets[i].Total / max;
             points.Add(new Point(x, y));
         }

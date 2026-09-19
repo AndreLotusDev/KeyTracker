@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory = $true)]
-    [string]$Version
+    [string]$Version,
+    [switch]$SkipE2E
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,10 +34,14 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet test failed with exit code $LASTEXITCODE"
 }
 
-Write-Host "==> Running e2e tests"
-dotnet test $e2eTestProject
-if ($LASTEXITCODE -ne 0) {
-    throw "dotnet test (e2e) failed with exit code $LASTEXITCODE"
+if ($SkipE2E) {
+    Write-Warning "Skipping e2e tests (-SkipE2E)."
+} else {
+    Write-Host "==> Running e2e tests"
+    dotnet test $e2eTestProject
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet test (e2e) failed with exit code $LASTEXITCODE"
+    }
 }
 
 Write-Host "==> Publishing $Version"

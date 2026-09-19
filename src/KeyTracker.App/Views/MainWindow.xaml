@@ -10,7 +10,8 @@
     <Window.Resources>
         <local:IntensityToBrushConverter x:Key="IntensityToBrushConverter" />
     </Window.Resources>
-    <Grid Margin="20">
+    <ScrollViewer x:Name="Scroller" AutomationProperties.AutomationId="DashboardScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="20" MinHeight="{Binding ViewportHeight, ElementName=Scroller}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -96,7 +97,7 @@
         </Border>
 
         <!-- Activity chart -->
-        <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16" MinHeight="180">
+        <Border Grid.Row="3" Background="#24272E" CornerRadius="6" Padding="16" MinHeight="260">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                     <TextBlock Text="Activity" Foreground="#9AA0AC" DockPanel.Dock="Left" VerticalAlignment="Center" />
@@ -109,7 +110,7 @@
                         AutomationProperties.AutomationId="ExportButton"
                         HorizontalAlignment="Right" Margin="0,12,0,0" Padding="12,6" />
 
-                <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding ChartLabels}" Margin="0,4,0,0">
+                <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding ChartBars}" Margin="0,4,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Rows="1" />
@@ -117,18 +118,42 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" Foreground="#9AA0AC" FontSize="10"
-                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding AxisLabel}" Foreground="#9AA0AC" FontSize="10"
+                                       HorizontalAlignment="Center" TextWrapping="NoWrap" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <Viewbox Stretch="Fill">
-                    <Canvas Width="600" Height="140">
-                        <Polyline Points="{Binding ChartPoints}" Stroke="#4FA0E0" StrokeThickness="2" />
-                    </Canvas>
-                </Viewbox>
+                <Grid MinHeight="140" Margin="0,6">
+                    <Viewbox Stretch="Fill">
+                        <Canvas Width="600" Height="140">
+                            <Polyline Points="{Binding ChartPoints}" Stroke="#4FA0E0" StrokeThickness="2" />
+                        </Canvas>
+                    </Viewbox>
+
+                    <!-- One column per bucket: hover area (tooltip) + point marker at the bucket's height -->
+                    <ItemsControl AutomationProperties.AutomationId="ChartBarsItemsControl" ItemsSource="{Binding ChartBars}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Transparent" ToolTip="{Binding Tooltip}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="{Binding UpperHeight}" />
+                                        <RowDefinition Height="{Binding LowerHeight}" />
+                                    </Grid.RowDefinitions>
+                                    <Ellipse Grid.Row="1" Width="8" Height="8" Fill="#4FA0E0"
+                                             VerticalAlignment="Top" Margin="0,-4,0,0" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
             </DockPanel>
         </Border>
     </Grid>
+    </ScrollViewer>
 </Window>
